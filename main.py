@@ -7,7 +7,7 @@ import traceback
 
 from extension.structures import Marjorie
 
-bot = Marjorie(';')
+bot = Marjorie('-')
 
 regex = re.compile(r"\\\/")
 
@@ -31,4 +31,4 @@ for path, _, files in os.walk("extension/cogs"):
         else:
             print(f"-> [Cog loaded] {path}")
 
-bot.run(os.getenv("DISCORD_TOKEN"))
+bot.run("NTQwNjA0MDAzMTA1Mzc0MjEw.XFNCtg.KAZLlGFt4OjgN3THPGJ49_yHl7w")

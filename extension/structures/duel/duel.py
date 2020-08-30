@@ -1,5 +1,8 @@
-from .abstract import Action
 from enum import Enum
+import typing
+
+from .abstract import Action
+
 
 class Classes(Enum):
     ASSASSIN = "Assassino"
@@ -17,7 +20,9 @@ def action(emoji) -> Action:
 
 
 class MortalPlayer:
-    def __init__(self, player):
+    def __init__(self, player, user):
+        self.user = user
+
         self._life = int()
 
         self.class_ = player.class_
@@ -68,3 +73,9 @@ class MortalPlayer:
     @hide.check(self) -> bool:
     def hide(self):
         return not self.invisible
+
+
+class Environment:
+    def __init__(self, players):
+        self.players = players
+

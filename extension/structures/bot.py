@@ -5,6 +5,10 @@ import os
 
 from .database import models, DatabaseClient
 
+def is_duelist():
+    async def check(ctx):
+        return bool(ctx.player)
+    return commands.check(check)
 
 class Cache:
     def __init__(self):
@@ -41,7 +45,12 @@ class Marjorie(commands.Bot):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        self.database_client = DatabaseClient(
+            "mongodb+srv://Nium:123@cluster0-dhe4w.mongodb.net/test?retryWrites=true&w=majority"
+        )
+
         self.cached_servers = Cache()
+        self.cached_players = Cache()
 
     async def get_server(self, id: int) -> models.Server:
         """
@@ -69,14 +78,51 @@ class Marjorie(commands.Bot):
 
             return data
 
+    async def get_player(self, id: int) -> models.Player:
+        """
+        Can be return `None`.
+
+        Parameters
+        ----------
+        id : int
+            Discord ID of the player.
+
+        Returns
+        -------
+        models.Player
+        """
+        if type(id) is not int:
+            raise TypeError("int expected in `id` parameter")
+
+        try:
+            return self.cached_players.get(id)
+        except KeyError:
+            data = await self.database_client.get_player(id)
+            return data
+
+    async def send(self, destiny, address: str, phs: dict, **kwargs):
+        result = 
+        await destiny.send(**kwargs)
+
     async def on_ready(self):
         print("I'm online!")
 
+    async def process_commands(self, message, server):
+        ctx = await self.get_context(message)
+
+        if ctx.valid:
+            player = await self.get_player(message.author.id)
+
+            ctx.server = server
+            ctx.player = player
+
+            await self.invoke(ctx)
+
     async def on_message(self, message):
+        if message.author.bot or message.is_system():
+            return
+
         server = await self.get_server(message.guild.id)
 
         if server.is_command_channel(message.channel.id):
-            await self.process_commands(message)
-
-    def new_task(self, coroutine):
-        
+            await self.process_commands(message, server)

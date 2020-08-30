@@ -68,7 +68,7 @@ class Server:
         self._dbcommand_channels = raw_data.get("command_channels", [])
 
     @property
-    def command_channels(self) -> typing.List[str, ...]:
+    def command_channels(self) -> typing.List[str]:
         return self._dbcommand_channels
 
     def to_dict(self) -> dict:
@@ -99,3 +99,7 @@ class Server:
             raise TypeError("int expected in `channel_id` parameter")
 
         return str(channel_id) in self._dbcommand_channels
+
+    @classmethod
+    def new(cls, id: int):
+        return cls({"_id": id})
