@@ -45,9 +45,7 @@ class Marjorie(commands.Bot):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.database_client = DatabaseClient(
-            "mongodb+srv://Nium:123@cluster0-dhe4w.mongodb.net/test?retryWrites=true&w=majority"
-        )
+        self.database_client = DatabaseClient(os.getenv("MOGODB-URL"))
 
         self.cached_servers = Cache()
         self.cached_players = Cache()
