@@ -70,8 +70,8 @@ class MortalPlayer:
     async def hide(self, message, player, enemy):
         pass
 
-    @hide.check(self) -> bool:
-    def hide(self):
+    @hide.check
+    def hide(self) -> bool:
         return not self.invisible
 
 

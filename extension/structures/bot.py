@@ -2,13 +2,26 @@ from discord.ext import commands, tasks
 
 import typing
 import os
+import json
 
 from .database import models, DatabaseClient
+from extension.structures import errors, utils
+
+
+DEFAULT_LANGUAGE = "english"
 
 def is_duelist():
     async def check(ctx):
-        return bool(ctx.player)
+        if ctx.player:
+            return True
+        raise errors.IsNotDuelistError()
     return commands.check(check)
+
+def not_dueling():
+    async def check(ctx):
+        return True
+    return commands.check(check)
+
 
 class Cache:
     def __init__(self):
@@ -41,11 +54,47 @@ class Cache:
         return self._data[reference]
 
 
+class MarjorieContext(commands.Context):
+    @property
+    def language(self) -> str:
+        """
+        Retorna a lingua que está sendoe usada no contexto.
+        """
+        try:
+            return self.server.language
+        except AttributeError:
+            if self.player:
+                return self.player.language
+
+            return DEFAULT_LANGUAGE
+
+    def get_sample_address(self, address):
+        command_name = self.command.name
+            
+        if self.command.parent:
+            command_name += '.' + self.command.parent.name
+
+        root = utils.join_address(root, commands)
+        return utils.join_address(root, address)
+
+    async def send(self, root="Commands", address: str):
+        if root == "Commands":
+            address = self.get_sample_address(address)
+        else:
+            address = utils.join_address(root, address)
+
+        address = utils.join_address(address, self.language)
+        
+
+
 class Marjorie(commands.Bot):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.database_client = DatabaseClient(os.getenv("MOGODB-URL"))
+        self.database_client = DatabaseClient(os.getenv("MONGODB_URL"))
+
+        # TODO
+        # Remover o token quando for dar commit :D
 
         self.cached_servers = Cache()
         self.cached_players = Cache()
@@ -71,8 +120,11 @@ class Marjorie(commands.Bot):
 
             if not data:
                 data = models.Server.new(id)
+                self.cached_servers.add(id, data)
 
                 await self.database_client.new_server(data)
+
+                return data
 
             return data
 
@@ -96,17 +148,24 @@ class Marjorie(commands.Bot):
             return self.cached_players.get(id)
         except KeyError:
             data = await self.database_client.get_player(id)
+
+            self.cached_players.add(id, data)
+
             return data
 
     async def send(self, destiny, address: str, phs: dict, **kwargs):
-        result = 
-        await destiny.send(**kwargs)
+        """
+        Envia o resultado formato de `address` com `phs` para `destiny`.
+        """
+        result = utils.get_address_result(address, phs)
+        result = result.format(**phs)
+        await destiny.send(result, **kwargs)
 
     async def on_ready(self):
         print("I'm online!")
 
     async def process_commands(self, message, server):
-        ctx = await self.get_context(message)
+        ctx = await self.get_context(message, cls=MarjorieContext)
 
         if ctx.valid:
             player = await self.get_player(message.author.id)
@@ -124,3 +183,10 @@ class Marjorie(commands.Bot):
 
         if server.is_command_channel(message.channel.id):
             await self.process_commands(message, server)
+
+    async def on_command_error(self, ctx, error):
+        if isinstance(error, errors.IsNotDuelistError):
+            await ctx.send("Not duelist")
+
+        else:
+            raise error
