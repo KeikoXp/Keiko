@@ -97,9 +97,9 @@ class Marjorie(commands.Bot):
         self.cached_players = Cache()
 
         self._tasks = []
-        self._task_reader()
+        self.loop.create_task(self._task_reader())
 
-    def _task_reader(self):
+    async def _task_reader(self):
         while True:
             if not self._tasks:
                 await asyncio.sleep(10)
