@@ -2,14 +2,11 @@ if __name__ != "__main__":
     raise RuntimeError("don't import this!")
 
 import os
-import re
 import traceback
 
 from extension.structures import Marjorie
 
 bot = Marjorie(';')
-
-regex = re.compile(r"\\\/")
 
 for path, _, files in os.walk("extension/cogs"):
     for file in files:
@@ -21,12 +18,12 @@ for path, _, files in os.walk("extension/cogs"):
         if ext != ".py":
             continue
 
-        path = re.sub(regex, '.', path)
+        path = path.replace("\\", '.').replace('/', '.')
         try:
             bot.load_extension(path)
-        except BaseException as error:
+        except Exception:
             traceback.print_exc()
-            # se utilizar `raise` error a inicialização do BOT é
+            # se utilizar `raise error` a inicialização do BOT é
             # cancelada, utilizando dessa forma, isso não acontece.
         else:
             print(f"-> [Cog loaded] {path}")
