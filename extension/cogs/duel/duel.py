@@ -2,6 +2,7 @@ from discord.ext import commands
 from discord import errors as discord_errors
 
 import asyncio
+import traceback
 
 from extension import structures
 from extension.structures import utils
@@ -51,6 +52,10 @@ class Duel(commands.Cog):
                 # Pode acontecer de uma pessoa fechar a DM durante o
                 # duelo, se isso acontecer, um erro é gerado.
 
+                # TODO
+                # Verificar se o erro foi porque alguém fechou a DM.
+                traceback.print_exc()
+
                 base_address = "Commands.duel.canceled-match."
                 try:
                     address = base_address + player_one.language
@@ -89,7 +94,8 @@ class Duel(commands.Cog):
                     # TODO
                     # Criar um verificador pra ver se um duelo entre
                     # ambos players é justa.
-                    self.queue.pop(index)
+                    self.queue.pop(index) # Retira o `player_two` da
+                    # queue.
 
                     coroutine = self.match(player_one, player_two)
                     task = self.bot.loop.create_task(coroutine)
