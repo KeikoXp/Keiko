@@ -1,0 +1,223 @@
+{
+    "DuelActions": {
+        "Attack": {
+            "NoAmmunition": {
+                "pt-br": [
+                    "Você não tinha munição para atacar.",
+                    "O seu inimigo não tinha munição para atacar."],
+                "english": [
+                    "You didn't have ammunition to attack!",
+                    "Your enemy didn't have ammunition to attack!"],
+                "italian": [
+                    "Non hai munizioni per attaccare!",
+                    "Il tuo nemico non ha munizioni per attaccare!"],
+                "french": [
+                    "Tu n'avais pas de munitions pour attaquer.",
+                    "Ton ennemi n'avais pas de munitions pour attaquer."]
+            },
+            "MissDamage": {
+                "pt-br": [
+                    "Você errou o ataque!",
+                    "O seu inimigo errou o ataque!"],
+                "english": [
+                    "You missed the attack!",
+                    "Your enemy missed the attack!"],
+                "italian": [
+                    "L'attacco non è andato a segno!",
+                    "Il nemico ti ha mancato."],
+                "french": [
+                    "Tu as raté l'attaque!",
+                    "Ton ennemi a raté l'attaque!"]
+            },
+            "FinalDamage": {
+                "pt-br": [
+                    "Você causou **{damage}** de dano no seu inimigo!",
+                    "O seu inimigo te causou **{damage}** de dano em você!"],
+                "english": [
+                    "You caused **{damage}** of damage in your enemy!",
+                    "Your enemy caused **{damage}** of damage on you!"],
+                "italian": [
+                    "Hai inflitto **{damage}** di danno al tuo nemico!",
+                    "Il tuo nemico ti ha inflitto **{damage}** di danno!"
+                ],
+                "french": [
+                    "Tu as causé **{damage}** de dégâts à ton ennemi!",
+                    "Ton ennemi t'a causé **{damage}** de dégâts!"]
+            }
+        },
+        "ConjurateSpell": {
+            "FinalMessages": {
+                "pt-br": [
+                    "Você conjurou a magia **{spell.name}**!\n{result}",
+                    "O seu inimigo conjurou a magia **{spell.name}**!\n{result}"],
+                "english": [
+                    "You use the **{spell.name}** spell!\n{result}",
+                    "Your enemy used **{spell.name}** spell!\n{result}"],
+                "italian": [
+                    "",
+                    ""],
+                "french": [
+                    "",
+                    ""]
+            }
+        },
+        "Rest": {
+            "pt-br": [
+                "Você descansou e recebeu **{healed}** de vida!",
+                "O seu inimigo descansou e recebeu **{healed}** de vida!"],
+            "english": [
+                "You rested and received **{healed}** of life!",
+                "Your enemy rested and received **{healed}** of life!"],
+            "italian": [
+                "Ti sei riposato e hai ricevuto **{healed}** di vita!",
+                "Il tuo nemico si è riposato e ha ricevuto **{healed}** di vita!"],
+            "french": [
+                "Tu t'es reposé(e) et a reçu **{healed}** de vie!",
+                "Ton ennemi s'est reposé(e) et a reçu **{healed}** de vie!"]
+        },
+        "Hide": {
+            "pt-br": [
+                "Você se escondeu!",
+                "O seu inimigo se escondeu!"],
+            "english": [
+                "You threw a smoke bomb!",
+                "Your enemy threw a smoke bomb and hid!"],
+            "italian": [
+                "Ti sei nascosto!",
+                "Il tuo nemico si è nascosto!"],
+            "french": [
+                "Tu t'es caché(e).",
+                "Ton ennemi s'est caché(e)."]
+        },
+        "Surrender": {
+            "pt-br": [
+                "Você desistiu do duelo, nãoo!",
+                "O seu inimigo desistiu do duelo, isso aí!"],
+            "english": [
+                "You gave up, what!",
+                "Your enemy gave up!"],
+            "italian": [
+                "Ti sei arreso, noooo!",
+                "Il tuo nemico si è arreso!"],
+            "french": [
+                "Tu as abandonné le duel, non!",
+                "Ton ennemi a abandonné le duel, bon!"]
+        }
+    },
+
+    "Errors": {
+        "Forbidden": {
+            "DM-CLOSED": {
+                "pt-br": "As suas mensagens diretas estão fechadas, abra para que eu possa conversar com você!",
+                "english": "Your direct messages are closed, open so I can talk to you!",
+                "itilian": "I tuoi messaggi sono bloccati, aprili cosi posso parlarti!",
+                "french": "Tes messages directs sont fermés, ouvre-les pour que je puisse parler avec toi."
+            }
+        }
+    },
+
+    "Commands": {
+        "start": {
+            "timeout": {
+                "pt-br": "Você demorou demais para responder.",
+                "english": "Are you there?!",
+                "italian": "",
+                "french": "Alô, es-tu là?!"
+            },
+            "note": {
+                "pt-br": "Reaja com ➡️ para ir a próxima mensagem. Há um cooldown de 5 segundos para ir/deslizar para a próxima mensagem.",
+                "english": "React with ➡️ to go to the next message. There is a 5-second cooldown to swipe to the next message.",
+                "italian": "",
+                "french": "Réagisse avec ➡️ pour passer au message suivant. Il y a un temps de recharge de 5 secondes pour passer au message suivant."
+            },
+            "phrases": [
+                {"pt-br": "Eita, então você quer ser um duelista?! Isso é demais!",
+                 "english": "Wow, so you want to be a duelist?! This is awesome!",
+                 "italian": "",
+                 "french": "Donc tu veux être un duelliste? C'est super!"},
+
+                 {"pt-br": "O duelo muda conforme haja necessidade de balanceamento, então, é recomendado que você esteja no meu servidor para poder acompanhar os balanceamentos no canal <#601924881793417218>!",
+                 "english": "The duel is modified according to balance necessity, so It's recommended that you be on my server to follow the balances in the <#601924881793417218> channel!",
+                 "italian": "",
+                 "french": "Le duel change en fonction du besoin d'équilibrage, il est donc recommandé d'être sur mon serveur pour surveiller l'équilibrage dans le canal <#601924881793417218>"},
+
+                 {"pt-br": "Daqui a pouco você poderá escolher a sua classe, **não é possível trocar de classe até que uma doação seja feita.**",
+                 "english": "Soon you will be able to choose your class, **it's not possible to change your class unless a donation is made.**",
+                 "italian": "",
+                 "french": "Bientôt tu pourras choisir ta classe, ce n'est pas possible de changer de classe, sauf si tu fais un don"},
+
+                 {"pt-br": "Você pode utilizar o comando `;estatísticas` para ver qual a classe que possuí mais vitórias ou derrotas, etc...!",
+                 "english": "You can use the `;statistics` command to see which class has the most wins, losses, etc...",
+                 "italian": "",
+                 "french": "Tu peux utiliser la commande `;statistics` pour voir quelle classe a le plus de victoires, de derrotes, etc..."},
+
+                {"pt-br": "Você pode utilizar o comando `;sobre <nome da classe>` para ver **TUDO** sobre uma classe!",
+                 "english": "You can use the `;about <class name>` command to see **EVERYTHING** about a class!",
+                 "italian": "",
+                 "french": "Tu peux utiliser la commande `;sur <nom de la classe>` pour voir **TOUT** sur une classe!"},
+
+                {"pt-br": "Atualmente existe {class_amount} classes! {classes}",
+                 "english": "You can use the `;about <name of the class>` command to see **EVERYTHING** about the class!",
+                 "italian": "",
+                 "french": ""}
+            ]
+        },
+        "duel": {
+            "turn-lost": {
+                "pt-br": [
+                    "Você perdeu a vez!",
+                    "O seu inimigo perdeu a vez!"],
+                "italian": [
+                    "...",
+                    "..."],
+                "english": [
+                    "You lost yor turn!",
+                    "Your enemy lost him turn!"],
+                "french": [
+                    "...",
+                    "..."]
+            },
+            "canceled-match": {
+                "pt-br": "O duelo foi cancelado, pois ocorreu um erro.",
+                "english": "The match has been canceled because an error ocurried.",
+                "italian": "Il duello è stato annullato per via di un errore.",
+                "french": ""
+            },
+            "in-queue": {
+                "pt-br": "Você já está na fila!",
+                "english": "You are already in queue!",
+                "italian": "Sei già in coda!",
+                "french": "Tu es déjà en file d'attente!"
+            },
+            "put-in-queue": {
+                "pt-br": "Você foi posto na fila de espera! Aguarde um pouco até eu encontrar alguém para você",
+                "english": "You have been put in the queue! Wait a while until I find someone for you!",
+                "italian": "Sei stato inserito in coda! Attendi affinchè non troviamo qualcuno per te!",
+                "french": "Tu as mis dans la file d'attente! Attends un moment que je cherche quelqu'un pour toi!"
+            }
+        },
+        "language": {
+            "invalid-language": {
+                "pt-br": "Você informou uma linguagem inválida!",
+                "english": "You've informed an invalid language!",
+                "italian": "Hai inserito una lingua inesistente...",
+                "french": "Tu as informé une langue invalide!"
+            },
+            "final-message": {
+                "pt-br": "Você mudou sua linguágem para {language}!",
+                "english": "You changed the language to {language}!",
+                "italian": "Hai cambiato la lingua per {language}!",
+                "french": "Tu as changé la langue pour {language}!"
+            }
+        }
+    },
+
+    "Others": {
+        "change-language-message": [
+                "🇧🇷 Você pode trocar a minha lingua utilizando o comando `;language <lingua>`!",
+                "🇬🇧 You can change my language by using the `;language <language>` command!",
+                "🇮🇹 ...",
+                "🇫🇷 Tu peux changer ma langue en utilisant la commande `;langue <langue>`!"
+            ]
+    }
+}

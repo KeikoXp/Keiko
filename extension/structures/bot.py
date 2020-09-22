@@ -93,9 +93,6 @@ class Marjorie(commands.Bot):
 
         self.database_client = DatabaseClient(os.getenv("MONGODB_URL"))
 
-        # TODO
-        # Remover o token quando for dar commit :D
-
         self.cached_servers = Cache()
         self.cached_players = Cache()
 

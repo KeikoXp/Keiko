@@ -91,14 +91,14 @@ class Duel(commands.Cog):
                     # ambos players é justa.
                     self.queue.pop(index)
 
-                coroutine = self.match(player_one, player_two)
-                task = self.bot.loop.create_task(coroutine)
-                self.bot.tasks.append(task)
-                # É extramemente necessário criar uma task, além de não
-                # interromper a execução do código, fará com que erros
-                # gerados na função também não interrompão o código.
+                    coroutine = self.match(player_one, player_two)
+                    task = self.bot.loop.create_task(coroutine)
+                    self.bot.tasks.append(task)
+                    # É extramemente necessário criar uma task, além de não
+                    # interromper a execução do código, fará com que erros
+                    # gerados na função também não interrompão o código.
 
-                break
+                    break
 
             await sleep(1)
 
