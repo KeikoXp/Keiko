@@ -3,6 +3,7 @@ from discord.ext import commands, tasks
 import typing
 import os
 import json
+import asyncio
 
 from .database import models, DatabaseClient
 from extension.structures import errors, utils
@@ -84,7 +85,6 @@ class MarjorieContext(commands.Context):
             address = utils.join_address(root, address)
 
         address = utils.join_address(address, self.language)
-        
 
 
 class Marjorie(commands.Bot):
@@ -95,6 +95,27 @@ class Marjorie(commands.Bot):
 
         self.cached_servers = Cache()
         self.cached_players = Cache()
+
+        self._tasks = []
+        self._task_reader()
+
+    def _task_reader(self):
+        while True:
+            if not self._tasks:
+                await asyncio.sleep(10)
+
+            for index, task in enumerate(self._tasks):
+                if task.done():
+                    task = self._tasks.pop(index)
+                    task.print_stack()
+
+                    break
+
+            await asyncio.sleep(.5)
+
+    def create_task(self, coroutine):
+        task = self.loop.create_task(coroutine)
+        self._tasks.append(task)
 
     async def get_server(self, id: int) -> models.Server:
         """

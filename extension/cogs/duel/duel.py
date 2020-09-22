@@ -98,8 +98,7 @@ class Duel(commands.Cog):
                     # queue.
 
                     coroutine = self.match(player_one, player_two)
-                    task = self.bot.loop.create_task(coroutine)
-                    self.bot.tasks.append(task)
+                    self.bot.create_task(coroutine)
                     # É extramemente necessário criar uma task, além de não
                     # interromper a execução do código, fará com que erros
                     # gerados na função também não interrompão o código.
