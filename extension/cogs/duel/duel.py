@@ -1,9 +1,10 @@
 from discord.ext import commands
-import discord
+from discord import errors as discord_errors
 
 import asyncio
 
 from extension import structures
+from extension.structures import utils
 
 
 class Duel(commands.Cog):
@@ -11,7 +12,7 @@ class Duel(commands.Cog):
         self.bot = bot
 
         self.queue = list()
-        self.queue_task = bot.create_task(self.queue_selector())
+        self.queue_task = bot.loop.create_task(self.queue_selector())
 
         self.duels = []
 
@@ -54,13 +55,13 @@ class Duel(commands.Cog):
                 try:
                     address = base_address + player_one.language
                     await self.bot.send(player_one, address)
-                except Forbidden:
+                except discord_errors.Forbidden:
                     pass
 
                 try:
                     address = base_address + player_two.language
                     await self.bot.send(player_two, address)
-                except Forbidden:
+                except discord_errors.Forbidden:
                     pass
 
                 raise error
@@ -82,27 +83,97 @@ class Duel(commands.Cog):
                 continue
 
             for index, player_two in enumerate(self.queue):
-                # FIXME
-                # Pode acontecer da lista mudar de tamanho, se isso
-                # acontecer, um erro é gerado.
-                # Isso acontece apenas se um item é inserido em um index
-                # em que a iteração já tenha passado.
-                # No nosso caso, acontecerá quando um jogador premium
-                # entrar na fila, pois ele é inserido no começo da fila.
-                player_two = self.queue.pop(index)
+                player_two = self.queue[index]
+
+                if player_one and player_two:
+                    # TODO
+                    # Criar um verificador pra ver se um duelo entre
+                    # ambos players é justa.
+                    self.queue.pop(index)
 
                 coroutine = self.match(player_one, player_two)
-                self.bot.loop.create_task(coroutine) # self.bot.new_task(coroutine)
+                task = self.bot.loop.create_task(coroutine)
+                self.bot.tasks.append(task)
                 # É extramemente necessário criar uma task, além de não
                 # interromper a execução do código, fará com que erros
                 # gerados na função também não interrompão o código.
 
+                break
+
             await sleep(1)
 
     @structures.bot.is_duelist()
+    #@structures.bot.not_dueling()
     @commands.command(name="duel")
     async def duel_command(self, ctx):
-        pass
+        if ctx.author.id in self.queue:
+            return await ctx.send(travel="in-queue")
+
+        try:
+            await ctx.send(destiny=ctx.author, travel="put-in-queue")
+        except discord_errors.Forbidden:
+            await ctx.send(root="Errors", travel="Forbidden.DM-CLOSED")
+        else:
+            if ctx.player.premium:
+                self.queue.insert(0, ctx.author.id)
+            else:
+                self.queue.append(ctx.author.id)
+
+            if ctx.guild:
+                await ctx.message.add_reaction('✅')
+
+    @commands.command(name="start")
+    async def start_command(self, ctx):
+        messages = utils.get_address_result("Others.change-language-message")
+        await ctx.send('\n'.join(messages))
+
+        await asyncio.sleep(10)
+
+        notes = utils.get_address_result("Commands.start.note")
+        for text in utils.get_address_result("Commands.start.phrases"):
+            text = text[ctx.server.language]
+            text += "\n\n" + notes[ctx.server.language]
+
+            try:
+                await message.edit(content=text)
+            except:
+                message = await ctx.send(text)
+            finally:
+                await message.add_reaction('➡️')
+
+            def check(reaction, user):
+                return user == ctx.author and \
+                       str(reaction.emoji) == '➡️' and \
+                       reaction.message.id == message.id
+
+            await asyncio.sleep(3)
+
+            try:
+                await self.bot.wait_for("reaction_add", check=check,
+                                        timeout=120)
+            except asyncio.TimeoutError:
+                return
+
+        await message.delete()
+
+        message = await ctx.send(address="classes")
+
+        class_emojis = ['👹', '🧙', '🗡️', '🛡️', '🏹']
+        for emoji in class_emojis:
+            await message.add_reaction(emoji)
+
+        def check(reaction, user):
+            return user == ctx.author and \
+                   reaction.message.id == message.id and \
+                   str(reaction.emoji) in class_emojis
+
+        try:
+            reaction, _ = await self.bot.wait_for("reaction_add", check=check,
+                                                  timeout=120)
+        except asyncio.TimeoutError:
+            return
+
+        emoji = str(reaction.emoji)
 
 
 def setup(bot):
