@@ -76,6 +76,12 @@ class MortalPlayer:
 
 
 class Environment:
-    def __init__(self, players):
+    def __init__(self, players, bot):
         self.players = players
+        self.bot = bot
 
+    async def start(self):
+        """
+        Inicia o ambiente do duelo.
+        """
+        pass

@@ -160,7 +160,13 @@
                  "english": "You can use the `;about <name of the class>` command to see **EVERYTHING** about the class!",
                  "italian": "",
                  "french": ""}
-            ]
+            ],
+            "classes": {
+                "pt-br": "Que classe você quer? {classes}? Reaja com o emoji da classe (o que está ao lado do nome da classe).",
+                "english": "What class do you want? {classes}? React with the emoji of the classe (that is on the side of the name of the class).",
+                "italian": "...",
+                "french": "..."
+            }
         },
         "duel": {
             "turn-lost": {
