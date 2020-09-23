@@ -1,8 +1,7 @@
-from discord.ext import commands, tasks
+from discord.ext import commands
 
 import typing
 import os
-import json
 import asyncio
 
 from .database import models, DatabaseClient
@@ -11,12 +10,14 @@ from extension.structures import errors, utils
 
 DEFAULT_LANGUAGE = "english"
 
+
 def is_duelist():
     async def check(ctx):
         if ctx.player:
             return True
         raise errors.IsNotDuelistError()
     return commands.check(check)
+
 
 def not_dueling():
     async def check(ctx):
@@ -69,16 +70,24 @@ class MarjorieContext(commands.Context):
 
             return DEFAULT_LANGUAGE
 
+    @property
+    def or_separator(self) -> str:
+        if self.language == "pt-br":
+            return "ou"
+        elif self.language == "english":
+            return "or"
+        else:
+            return '?'
+
     def get_sample_address(self, address):
         command_name = self.command.name
-            
+
         if self.command.parent:
             command_name += '.' + self.command.parent.name
 
-        root = utils.join_address(root, commands)
-        return utils.join_address(root, address)
+        return utils.join_address(command_name, address)
 
-    async def send(self, root="Commands", address: str):
+    async def send(self, address: str, root="Commands",):
         if root == "Commands":
             address = self.get_sample_address(address)
         else:

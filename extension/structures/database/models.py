@@ -1,4 +1,3 @@
-import discord
 import typing
 import datetime
 
@@ -7,13 +6,13 @@ class Player:
     def __init__(self, raw_data: dict):
         if type(raw_data) is not dict:
             raise TypeError("dict expected in 'raw_data' parameter")
- 
+
         self.__dict__["_locked"] = True
- 
+
         self._db_id = raw_data.get("_id", None)
         if not self._db_id:
             raise RuntimeError("'_id' not defined in 'raw_data'")
- 
+
         self._dbclass = raw_data.pop("class", None)
 
         self._dbexperience = raw_data.pop("experience", int())
@@ -86,7 +85,7 @@ class Player:
         return result
 
     def is_duelist(self) -> bool:
-        return self.class_ != None
+        return bool(self.class_)
 
     def __setattr__(self, name: str, value: typing.Any):
         if not self._locked and name.startswith("_db"):
@@ -99,7 +98,7 @@ class Server:
     def __init__(self, raw_data: dict):
         if type(raw_data) is not dict:
             raise TypeError("dict expected in 'raw_data' parameter")
- 
+
         self._db_id = raw_data.get("_id", None)
         if not self._db_id:
             raise RuntimeError("'_id' not defined in 'raw_data'")

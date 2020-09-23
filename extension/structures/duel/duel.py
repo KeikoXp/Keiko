@@ -1,18 +1,19 @@
 from enum import Enum
-import typing
+# import typing
 
 from .abstract import Action
 
 
 class Classes(Enum):
     ASSASSIN = "Assassino"
-    WARRIOR  = "Guerreiro"
+    WARRIOR = "Guerreiro"
+
 
 def action(emoji) -> Action:
     """
     Parameters
     ----------
-    emoji : 
+    emoji : typing.Union[str, discord.Emoji, discord.PartialEmoji]
     """
     def decorator(function):
         return Action(function, emoji)

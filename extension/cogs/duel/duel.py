@@ -6,6 +6,7 @@ import traceback
 
 from extension import structures
 from extension.structures import utils
+from extension.structures.duel import CLASSES
 
 
 class Duel(commands.Cog):
@@ -34,8 +35,10 @@ class Duel(commands.Cog):
             player_one_data = await self.bot.get_player(player_one)
             player_two_data = await self.bot.get_player(player_two)
 
-            player_one = structures.duel.MortalPlayer(player_one_data, player_one)
-            player_two = structures.duel.MortalPlayer(player_two_data, player_two)
+            player_one = structures.duel.MortalPlayer(player_one_data,
+                                                      player_one)
+            player_two = structures.duel.MortalPlayer(player_two_data,
+                                                      player_two)
             # cria as estruturas para que os duelistas possam duelar.
 
             players = (player_one, player_two)
@@ -94,8 +97,8 @@ class Duel(commands.Cog):
                     # TODO
                     # Criar um verificador pra ver se um duelo entre
                     # ambos players é justa.
-                    self.queue.pop(index) # Retira o `player_two` da
-                    # queue.
+                    self.queue.pop(index)
+                    # Retira o `player_two` da queue.
 
                     coroutine = self.match(player_one, player_two)
                     self.bot.create_task(coroutine)
@@ -105,10 +108,10 @@ class Duel(commands.Cog):
 
                     break
 
-            await sleep(1)
+            await asyncio.sleep(1)
 
     @structures.bot.is_duelist()
-    #@structures.bot.not_dueling()
+    @structures.bot.not_dueling()
     @commands.command(name="duel")
     async def duel_command(self, ctx):
         if ctx.author.id in self.queue:
@@ -130,7 +133,7 @@ class Duel(commands.Cog):
     @commands.command(name="start")
     async def start_command(self, ctx):
         messages = utils.get_address_result("Others.change-language-message")
-        await ctx.send('\n'.join(messages))
+        message = await ctx.channel.send('\n'.join(messages))
 
         await asyncio.sleep(10)
 
@@ -141,8 +144,8 @@ class Duel(commands.Cog):
 
             try:
                 await message.edit(content=text)
-            except:
-                message = await ctx.send(text)
+            except discord_errors.NotFound:
+                message = await ctx.channel.send(text)
             finally:
                 await message.add_reaction('➡️')
 
@@ -161,10 +164,11 @@ class Duel(commands.Cog):
 
         await message.delete()
 
-        message = await ctx.send(address="classes")
+        classes = [f"{name} ({emoji})" for (name, emoji) if CLASSES.items()]
+        classes = utils.join_list(classes, separator=ctx.or_separator)
+        message = await ctx.send(address="classes", classes=classes)
 
-        class_emojis = ['👹', '🧙', '🗡️', '🛡️', '🏹']
-        for emoji in class_emojis:
+        for emoji in CLASSES.EMOJIS:
             await message.add_reaction(emoji)
 
         def check(reaction, user):

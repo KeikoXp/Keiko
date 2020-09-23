@@ -4,6 +4,7 @@ import inspect
 with open("translations.json", encoding="utf-8") as file:
     translations = json.load(file)
 
+
 def join_address(*values):
     """
     Junta os valores para formar um endereço.
@@ -13,7 +14,8 @@ def join_address(*values):
         values[index] = value.strip('.')
     return '.'.join(values)
 
-def get_address_result(addres: str, placeholders: dict={}):
+
+def get_address_result(addres: str, placeholders: dict = {}):
     result = translations
     for key in addres.split('.'):
         result = result[key]
@@ -26,6 +28,7 @@ def get_address_result(addres: str, placeholders: dict={}):
                 result[index] = value.format(**placeholders)
 
     return result
+
 
 def check_type_hints(function):
     """
@@ -44,10 +47,12 @@ def check_type_hints(function):
 
             if type_hint != inspect._empty:
                 if type(argument) != type_hint:
-                    raise TypeError(f"'{type_hint.__name__}' expected in '{parameter.name}' parameter")
+                    error = "{0!r} expected in {1!r} parameter".format(
+                        type_hint.__name__, parameter.name)
+                    raise TypeError(error)
 
         result = function(*args, **kwargs)
-        
+
         if signature.return_annotation:
             if type(result) != signature.return_annotation:
                 raise TypeError(
