@@ -39,13 +39,13 @@ class Duel(commands.Cog):
                                                       player_one)
             player_two = structures.duel.MortalPlayer(player_two_data,
                                                       player_two)
-            # cria as estruturas para que os duelistas possam duelar.
+            # Cria as estruturas para que os duelistas possam duelar.
 
             players = (player_one, player_two)
 
             env = structures.duel.Environment(players, self.bot)
             self.bot.envs.append(env)
-            # guardar o ambiente em que o duelo está acontencendo é
+            # Guardar o ambiente em que o duelo está acontencendo é
             # de extrema importância para que seja mais fácil de analisar
             # uma partida em andamento sem ter que finaliza-lá.
 
