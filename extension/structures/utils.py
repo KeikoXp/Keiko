@@ -29,6 +29,45 @@ def get_address_result(addres: str, placeholders: dict = {}):
 
     return result
 
+def join_values(*values, separator: str) -> str:
+    """
+    Junta valores entre vírgulas e insere `separator` no final.
+
+    Exemplos
+    --------
+    >>> join_values(1, 2, 3, separator='e')
+    '1, 2 e 3'
+    >>> join_values('Nium', 'Marjorie', separator='e')
+    'Nium e Marjorie'
+    >>> join_values('Sim', 'Não', seprator='ou')
+    'Sim ou Não'
+
+    Parametros
+    ----------
+    *values : typing.Tuple[typing.Any]
+        Os valores que serão juntados.
+    separator : str
+        O último separador que será colocado.
+
+    Retorno
+    -------
+    str
+        O resultado da junção.
+    """
+    left, right = values[:-1], values[-1]
+    left, right = ", ".join(map(str, left)), str(right)
+
+    # `values` pode ser entendido como typing.Tuple[typing.Any],
+    # `str.join` precisa de um iterador que retorne objetos do tipo
+    # `str` então, para aceitar números ou qualquer outra coisa, é
+    # necessário pegar a representação em string desses objetos.
+
+    if left and right:
+        separator = f" {separator} "
+    else:
+        return right
+
+    return separator.join([left, right])
 
 def check_type_hints(function):
     """

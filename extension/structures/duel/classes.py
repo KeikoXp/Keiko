@@ -124,6 +124,7 @@ def get_by_emoji(emoji) -> Class:
     Retorno
     -------
     Class
+        Classe.
     """
     for class_ in ALL:
         if class_.emoji == emoji:

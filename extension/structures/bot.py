@@ -28,7 +28,6 @@ def not_dueling():
 class Cache:
     def __init__(self):
         self._data = {}
-        self.database_client = DatabaseClient(os.getenv("MONGODB_URL"))
 
     def add(self, reference: typing.Any, value: typing.Any) -> None:
         """
@@ -60,7 +59,7 @@ class MarjorieContext(commands.Context):
     @property
     def language(self) -> str:
         """
-        Retorna a lingua que está sendoe usada no contexto.
+        Retorna a lingua que está sendo usada no contexto.
         """
         try:
             return self.server.language
