@@ -166,6 +166,12 @@
                 "english": "What class do you want? {classes}? React with the emoji of the classe (that is on the side of the name of the class).",
                 "italian": "...",
                 "french": "..."
+            },
+            "confirm": {
+                "pt-br": "Você realmente deseja virar um {class_}? Digite `confirm` para sim ou `cancel` para não.",
+                "english": "...",
+                "italian": "...",
+                "french": "..."
             }
         },
         "duel": {

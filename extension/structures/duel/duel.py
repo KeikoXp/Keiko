@@ -2,6 +2,7 @@ import typing
 
 from .abstract import Action
 from extension.structures import utils
+from extension.structures.duel import classes
 
 
 def action(emoji) -> Action:
@@ -87,7 +88,7 @@ class Environment:
             Resultado do turno para o jogador e para o seu inimigo.
         """
         messages = ['None', 'None']
-        return *messages
+        return messages
 
     async def start(self):
         """

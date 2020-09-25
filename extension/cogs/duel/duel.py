@@ -174,7 +174,7 @@ class Duel(commands.Cog):
         def check(reaction, user):
             return user == ctx.author and \
                    reaction.message.id == message.id and \
-                   str(reaction.emoji) in class_emojis
+                   str(reaction.emoji) in classes.EMOJIS
 
         try:
             reaction, _ = await self.bot.wait_for("reaction_add", check=check,
@@ -183,6 +183,29 @@ class Duel(commands.Cog):
             return
 
         emoji = str(reaction.emoji)
+        class_ = classes.get_by_emoji(emoji)
+
+        message = await ctx.send(address="confirm", class_=class_)
+        
+        def check(message):
+            return message.channel == ctx.channel and \
+                   message.author == ctx.author and \
+                   message.content.lower() in ["confirm", "cancel"]
+
+        try:
+            message = await self.bot.wait_for("message", check=check,
+                                              timeout=120)
+        except asyncio.TimeoutError:
+            return
+        finally:
+            await message.delete()
+
+        result = message.content.lower()
+        if result == "cancel":
+            return
+
+
+
 
 
 def setup(bot):
