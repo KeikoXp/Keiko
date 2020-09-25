@@ -6,7 +6,7 @@ import traceback
 
 from extension import structures
 from extension.structures import utils
-from extension.structures.duel import CLASSES
+from extension.structures.duel import classes
 
 
 class Duel(commands.Cog):
@@ -164,11 +164,11 @@ class Duel(commands.Cog):
 
         await message.delete()
 
-        classes = [f"{name} ({emoji})" for (name, emoji) if CLASSES.items()]
+        classes = [f"{class_.name} ({class_.emoji})" for class_ in classes.ALL]
         classes = utils.join_list(classes, separator=ctx.or_separator)
         message = await ctx.send(address="classes", classes=classes)
 
-        for emoji in CLASSES.EMOJIS:
+        for emoji in classes.EMOJIS:
             await message.add_reaction(emoji)
 
         def check(reaction, user):

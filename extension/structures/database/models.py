@@ -1,6 +1,8 @@
 import typing
 import datetime
 
+from extension.structures.duel import classes
+
 
 class Player:
     def __init__(self, raw_data: dict):
@@ -30,14 +32,11 @@ class Player:
         self.__dict__["_locked"] = False
 
     @property
-    def class_(self) -> str:
+    def class_(self) -> typing.Union[classes.Class, None]:
         """
-        Retorna a classe do jogador.
+        Retorna a classe do jogador. Pode ser `None`.
         """
-        # TODO
-        # Criar uma enumeração para as classes, dessa forma ficará fácil
-        # implementar comportamentos parecidos nas classes futuramente.
-        return self._dbclass
+        return classes.get_by_name(self._dbclass)
 
     @property
     def experience(self) -> int:
@@ -68,7 +67,7 @@ class Player:
         return self._dbvotes
 
     @property
-    def daily_cooldown(self) -> datetime.datetime:
+    def daily_reward_in_cooldown(self) -> datetime.datetime:
         if datetime.datetime.now() > self._dbdaily_cooldown:
             return self._dbdaily_cooldown
 
