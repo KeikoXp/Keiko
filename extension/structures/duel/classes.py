@@ -29,6 +29,26 @@ class Class(Explainable):
     def __nq__(self, other):
         return not self == other
 
+    def is_demon(self) -> bool:
+        """Diz se a classe é a classe de Demônio."""
+        return self.name == "Demon"
+
+    def is_mage(self) -> bool:
+        """Diz se a classe é a classe de Mago."""
+        return self.name == "Mage"
+
+    def is_warrior(self) -> bool:
+        """Diz se a classe é de Guerreiro."""
+        return self.name == "Warrior"
+
+    def is_assassin(self) -> bool:
+        """Diz se a classe é de Assassino."""
+        return self.name == "Assassin"
+
+    def is_shooter(self) -> bool:
+        """Diz se a classe é de Atirador."""
+        return self.name == "Shooter"
+
 
 class Demon(Class):
     """
@@ -124,7 +144,7 @@ def get_by_emoji(emoji) -> Class:
     Retorno
     -------
     Class
-        Classe.
+        A classe.
     """
     for class_ in ALL:
         if class_.emoji == emoji:

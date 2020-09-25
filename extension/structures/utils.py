@@ -102,3 +102,34 @@ def check_type_hints(function):
 
         return result
     return wrapper
+
+
+class Stack:
+    """
+    Atributos
+    ---------
+    value : int
+        Valor do stack.
+    max : int
+        Valor máximo que `value` pode chegar.
+    """
+    __slots__ = ("value", "max")
+
+    def __init__(self, max: int):
+        self.value = 0
+        self.max = max
+
+    @property
+    def full(self) -> bool:
+        """Diz se o stack está no máximo."""
+        return self.value >= self.max
+
+    def increase(self) -> None:
+        """Incrementa o stack em um se possível."""
+        if self.value + 1 <= self.max:
+        # if not self.full:
+            self.value += 1
+
+    def reset(self) -> None:
+        """Reseta o valor do stack."""
+        self.value = 0

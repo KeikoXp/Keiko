@@ -23,7 +23,7 @@ for path, _, files in os.walk("extension/cogs"):
             bot.load_extension(path)
         except Exception:
             traceback.print_exc()
-            # se utilizar `raise error` a inicialização do BOT é
+            # Se utilizar `raise error` a inicialização do BOT é
             # cancelada, utilizando dessa forma, isso não acontece.
         else:
             print(f"-> [Cog loaded] {path}")

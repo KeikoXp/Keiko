@@ -1,12 +1,7 @@
-from enum import Enum
-# import typing
+import typing
 
 from .abstract import Action
-
-
-class Classes(Enum):
-    ASSASSIN = "Assassino"
-    WARRIOR = "Guerreiro"
+from extension.structures import utils
 
 
 def action(emoji) -> Action:
@@ -26,25 +21,26 @@ class MortalPlayer:
 
         self._life = int()
 
-        self.class_ = player.class_
+        self.class_ = class_ = player.class_
 
-        if self.class_ == Classes.ASSASSIN:
-            self.evasion_stack = 0
-            self.max_evasion_stack = 3
+        if class_.is_assassin():
+            self.evasion = utils.Stack(3)
 
     @property
     def life(self) -> int:
-        """Returns the life of player."""
+        """Retorna a vida do jogador."""
         return self._life
 
     @property
     def dead(self) -> bool:
+        """Diz se o jogador está morto."""
         return self._life < 1
 
     @property
     def invisible(self) -> bool:
+        """Diz se o jogador está invisivel."""
         try:
-            return self.evasion_stack == self.max_evasion_stacks
+            return self.evasion.full
         except AttributeError:
             return False
 
@@ -69,7 +65,7 @@ class MortalPlayer:
 
     @action('💨')
     async def hide(self, message, player, enemy):
-        pass
+        self.evasion.increase()
 
     @hide.check
     def hide(self) -> bool:
@@ -81,8 +77,25 @@ class Environment:
         self.players = players
         self.bot = bot
 
+    async def make_turn(self, player, enemy) -> typing.Tuple[str, str]:
+        """
+        Faz o turno de um jogador.
+        
+        Retorno
+        -------
+        typing.Tuple[str, str]
+            Resultado do turno para o jogador e para o seu inimigo.
+        """
+        messages = ['None', 'None']
+        return *messages
+
     async def start(self):
         """
         Inicia o ambiente do duelo.
         """
-        pass
+        player, enemy = self.players
+        while all(not player.dead for player in self.players):
+            player, enemy = enemy, player
+
+            messages = await self.make_turn(player, enemy)
+            message_to_player, message_to_enemy = messages
