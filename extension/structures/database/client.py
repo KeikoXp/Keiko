@@ -14,37 +14,47 @@ class DatabaseClient:
 
     async def get_server(self, id: int) -> models.Server:
         """
-        Returns the data of server, can return `None`.
+        Retorna as informações do servidor, retorna `None` se não
+        encontrado.
 
-        Parameters
+        Parametros
         ----------
         id : int
+            Discord ID do servidor.
 
-        Returns
+        Retorno
         -------
         models.Server
         """
         if type(id) is not int:
             raise TypeError("int expected in `id` parameter")
+        
+        data = await self.servers.find_one({"_id": str(id)})
 
-        return await self.servers.find_one({"_id": str(id)})
+        if data:
+            return models.Server(data)
 
     async def get_player(self, id: int):
         """
-        Returns the data of player, can return `None`.
+        Retorna as informações do jogador, retorna `None` se não
+        encontrado.
 
-        Parameters
+        Parametros
         ----------
         id : int
+            Discord ID do jogador.
 
-        Returns
+        Retorno
         -------
         models.Player
         """
         if type(id) is not int:
             raise TypeError("int expected in `id` parameter")
 
-        return await self.players.find_one({"_id": str(id)})
+        data = await self.players.find_one({"_id": str(id)})
+
+        if data:
+            return models.Player(data)
 
     async def new_server(self, server: models.Server):
         """
