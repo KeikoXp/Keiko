@@ -108,13 +108,22 @@ class Server:
 
     @property
     def language(self) -> str:
+        """Retorna a língua do servidor."""
         return self._dblanguage
 
     @property
-    def command_channels(self) -> typing.List[str]:
-        return self._dbcommand_channels
+    def command_channels(self) -> typing.List[int]:
+        """
+        Retorna todos os IDs dos canais de comandos.
+
+        Retorno
+        -------
+        typing.List[int]
+        """
+        return [int(c) for c in self._dbcommand_channels]
 
     def to_dict(self) -> dict:
+        """Retorna todos os atributos do banco de dados em um dicionário."""
         result = {}
 
         for key, value in self.__dict__.items():
@@ -126,17 +135,22 @@ class Server:
 
     def is_command_channel(self, channel_id: id) -> bool:
         """
-        Parameters
+        Diz se o canal é um canal de comandos.
+
+        Parametros
         ----------
         channel_id : int
-            Discord ID of the TextChannel.
+            Discord ID do canal de texto.
 
-        Returns
+        Retorno
         -------
         bool
         """
         if not self._dbcommand_channels:
             return True
+
+        # Se não houver nenhum canal de comandos definido, todos os
+        # outros canais podem ser usados para executar os comandos.
 
         if type(channel_id) is int:
             raise TypeError("int expected in `channel_id` parameter")
@@ -145,4 +159,20 @@ class Server:
 
     @classmethod
     def new(cls, id: int):
-        return cls({"_id": id})
+        """
+        Cria uma instancia da classe baseada no `id`.
+
+        Parametros
+        ----------
+        id : int
+            Discord ID do servidor.
+
+        Retorno
+        -------
+        models.Server
+        """
+        if type(id) is not int:
+            raise TypeError("int expected")
+
+        data = {"_id": str(id)}
+        return cls(data)
