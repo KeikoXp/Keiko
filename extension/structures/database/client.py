@@ -1,4 +1,5 @@
 from motor.motor_asyncio import AsyncIOMotorClient
+from pymongo import errors as db_errors
 
 from . import models
 
@@ -34,7 +35,7 @@ class DatabaseClient:
         if data:
             return models.Server(data)
 
-    async def get_player(self, id: int):
+    async def get_player(self, id: int) -> models.Player:
         """
         Retorna as informações do jogador, retorna `None` se não
         encontrado.
@@ -56,11 +57,16 @@ class DatabaseClient:
         if data:
             return models.Player(data)
 
-    async def new_server(self, server: models.Server):
+    async def new_server(self, server: models.Server) -> None:
         """
-        Parameters
+        Parametros
         ----------
         server : models.Server
+
+        Raises
+        ------
+        ValueError
+            O servidor já foi registrado.
         """
         if not isinstance(server, models.Server):
             raise TypeError("models.Server expected in `server` parameter")
@@ -68,17 +74,25 @@ class DatabaseClient:
         server = server.to_dict()
         try:
             return await self.servers.insert_one(server)
-        # except db_errors.DuplicateKeyError:
-        except BaseException as e:
-            raise e
+        except db_errors.DuplicateKeyError:
+            raise ValueError("guild already registred")
 
-    async def new_player(self, player: models.Player):
+    async def new_player(self, player: models.Player) -> None:
+        """
+        Parametros
+        ----------
+        player : models.Player
+
+        Raises
+        ------
+        ValueError
+            O jogador já foi registrado.
+        """
         if not isinstance(player, models.Player):
             raise TypeError("models.Player expected in `player` parameter")
 
         player = player.to_dict()
         try:
             return await self.players.insert_one(player)
-        # except db_errors.DuplicateKeyError:
-        except BaseException as e:
-            raise e
+        except db_errors.DuplicateKeyError:
+            raise ValueError("player already registred")
