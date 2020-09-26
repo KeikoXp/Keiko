@@ -10,7 +10,7 @@ def join_address(*values):
     Junta os valores para formar um endereço.
     """
     values = list(values)
-    for index, value in values:
+    for index, value in enumerate(values):
         values[index] = value.strip('.')
     return '.'.join(values)
 
