@@ -86,13 +86,16 @@ class MarjorieContext(commands.Context):
 
         return utils.join_address(command_name, address)
 
-    async def send(self, address: str, root="Commands",):
+    async def send(self, address: str, root="Commands", **phs):
         if root == "Commands":
             address = self.get_sample_address(address)
-        else:
-            address = utils.join_address(root, address)
 
+        address = utils.join_address(root, address)
         address = utils.join_address(address, self.language)
+
+        result = utils.get_address_result(address, phs)
+
+        return await super().send(result)
 
 
 class Marjorie(commands.Bot):
@@ -127,12 +130,12 @@ class Marjorie(commands.Bot):
 
     async def get_server(self, id: int) -> models.Server:
         """
-        Parameters
+        Parametros
         ----------
         id : int
-            Discord ID of the server (guild).
+            Discord ID do servidor.
 
-        Returns
+        Retorno
         -------
         models.Server
         """
@@ -156,14 +159,14 @@ class Marjorie(commands.Bot):
 
     async def get_player(self, id: int) -> models.Player:
         """
-        Can be return `None`.
+        Pode retornar `None`.
 
-        Parameters
+        Parametros
         ----------
         id : int
-            Discord ID of the player.
+            Discord ID do jogador.
 
-        Returns
+        Retorno
         -------
         models.Player
         """
@@ -175,9 +178,38 @@ class Marjorie(commands.Bot):
         except KeyError:
             data = await self.database_client.get_player(id)
 
-            self.cached_players.add(id, data)
+            if data:
+                self.cached_players.add(id, data)
 
             return data
+
+    async def new_duelist(self, id: int, class_):
+        """
+        Cria um novo duelista.
+
+        Parametros
+        ----------
+        id : int
+            Discord ID do jogador.
+        class_ : duel.classes.Class
+            A classe do jogador.
+
+        Raises
+        ------
+        ValueError
+            O duelista já está registrado.
+        """
+        # Não é necessário verificar o tipo dos parametros pois o método
+        # abaixo utiliza os mesmos tipos e já faz essa verificação.
+        player = models.Player.new_duelist(id, class_)
+
+        await self.database_client.new_player(player)
+
+        # Se o jogador já estiver registrado, o método acima irá causar
+        # um erro finalizando este método e não irá colocar `Player` em
+        # cache.
+
+        self.cached_players.add(id, player)
 
     async def send(self, destiny, address: str, phs: dict, **kwargs):
         """

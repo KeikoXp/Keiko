@@ -33,47 +33,40 @@ class Player:
 
     @property
     def class_(self) -> typing.Union[classes.Class, None]:
-        """
-        Retorna a classe do jogador. Pode ser `None`.
-        """
+        """Retorna a classe do jogador. Pode ser `None`."""
         return classes.get_by_name(self._dbclass)
 
     @property
     def experience(self) -> int:
-        """
-        Retorna a quantidade de experiência do usuário.
-        """
+        """Retorna a quantidade de experiência do usuário."""
         return self._dbexperience
 
     @property
     def level(self) -> int:
-        """
-        Retorna o nível do usuário.
-        """
+        """Retorna o nível do usuário."""
         return self._dblevel
 
     @property
     def coins(self) -> int:
-        """
-        Retorna as modeas do usuário.
-        """
+        """Retorna as modeas do usuário."""
         return self._dbcoins
 
     @property
     def votes(self) -> int:
-        """
-        Retorna a quantidade de votos do usuário.
-        """
+        """Retorna a quantidade de votos do usuário."""
         return self._dbvotes
 
     @property
     def daily_reward_in_cooldown(self) -> datetime.datetime:
+        """Retorna a data em que o jogador poderá pegar a sua recompensa
+        diária."""
         if datetime.datetime.now() > self._dbdaily_cooldown:
             return self._dbdaily_cooldown
 
         self._dbdaily_cooldown = None
 
     def to_dict(self) -> dict:
+        """Retorna todos os atributos do banco de dados em um dicionário."""
         result = {}
 
         for key, value in self.__dict__.items():
@@ -84,6 +77,7 @@ class Player:
         return result
 
     def is_duelist(self) -> bool:
+        """Diz se o usuário é um duelista,"""
         return bool(self.class_)
 
     def __setattr__(self, name: str, value: typing.Any):
@@ -91,6 +85,32 @@ class Player:
             self.__dict__["need_update"] = True
 
         self.__dict__[name] = value
+
+    @classmethod
+    def new_duelist(cls, id: int, class_: classes.Class):
+        """
+        Cria uma instancia da class baseada no `id` e `class_`.
+
+        Parametros
+        ----------
+        id : int
+            Discord ID do jogador.
+        class_ : duel.classes.Class
+            Classe do duelista.
+
+        Retorno
+        -------
+        models.Player
+        """
+        if type(id) is not int:
+            raise TypeError("int expected in `id` parameter")
+
+        if not issubclass(class_.__class__, classes.Class):
+            error = "subclass of classes.Class expected in `class_` parameter"
+            raise TypeError(error)
+
+        data = {"_id": str(id), "class": str(class_)}
+        return cls(data)
 
 
 class Server:

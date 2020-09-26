@@ -118,6 +118,12 @@
 
     "Commands": {
         "start": {
+            "already-duelist": {
+                "pt-br": "Você já é um duelista!",
+                "english": "You already a duelist!",
+                "italian": "...",
+                "french": "..."
+            },
             "timeout": {
                 "pt-br": "Você demorou demais para responder.",
                 "english": "Are you there?!",
@@ -168,10 +174,16 @@
                 "french": "..."
             },
             "confirm": {
-                "pt-br": "Você realmente deseja virar um {class_}? Digite `confirm` para sim ou `cancel` para não.",
-                "english": "...",
+                "pt-br": "Você realmente deseja virar um **{class_}** {class_.emoji}? Digite `confirm` para sim ou `cancel` para não.",
+                "english": "Do you really want **{class_}** {class_.emoji}? Write `confirm` or `cancel`.",
                 "italian": "...",
                 "french": "..."
+            },
+            "result": {
+                "pt-br": "",
+                "english": "",
+                "italian": "",
+                "french": ""
             }
         },
         "duel": {

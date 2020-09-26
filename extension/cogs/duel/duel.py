@@ -132,13 +132,18 @@ class Duel(commands.Cog):
 
     @commands.command(name="start")
     async def start_command(self, ctx):
+        if ctx.player:
+            return await ctx.send("already-duelist")
+
         messages = utils.get_address_result("Others.change-language-message")
         message = await ctx.channel.send('\n'.join(messages))
 
-        await asyncio.sleep(10)
+        #await asyncio.sleep(10)
 
         notes = utils.get_address_result("Commands.start.note")
         for text in utils.get_address_result("Commands.start.phrases"):
+            break
+
             text = text[ctx.server.language]
             text += "\n\n" + notes[ctx.server.language]
 
@@ -160,13 +165,14 @@ class Duel(commands.Cog):
                 await self.bot.wait_for("reaction_add", check=check,
                                         timeout=120)
             except asyncio.TimeoutError:
-                return
+                return await message.delete()
 
         await message.delete()
 
-        classes = [f"{class_.name} ({class_.emoji})" for class_ in classes.ALL]
-        classes = utils.join_list(classes, separator=ctx.or_separator)
-        message = await ctx.send(address="classes", classes=classes)
+        classes_ = [f"{class_!s} ({class_.emoji})" for class_ in classes.ALL]
+        classes_ = utils.join_values(*classes_, separator=ctx.or_separator)
+
+        message = await ctx.send(address="classes", classes=classes_)
 
         for emoji in classes.EMOJIS:
             await message.add_reaction(emoji)
@@ -180,7 +186,7 @@ class Duel(commands.Cog):
             reaction, _ = await self.bot.wait_for("reaction_add", check=check,
                                                   timeout=120)
         except asyncio.TimeoutError:
-            return
+            return await message.delete()
 
         emoji = str(reaction.emoji)
         class_ = classes.get_by_emoji(emoji)
@@ -193,19 +199,26 @@ class Duel(commands.Cog):
                    message.content.lower() in ["confirm", "cancel"]
 
         try:
-            message = await self.bot.wait_for("message", check=check,
-                                              timeout=120)
+            response = await self.bot.wait_for("message", check=check,
+                                               timeout=120)
         except asyncio.TimeoutError:
             return
         finally:
             await message.delete()
 
-        result = message.content.lower()
+        result = response.content.lower()
         if result == "cancel":
             return
 
-
-
+        try:
+            await self.bot.new_duelist(ctx.user, class_)
+        except ValueError:
+            # Pode acontecer do comando ser executado duas vezes por uma
+            # pessoa, se um comando for completado, o outro acabará
+            # gerando esse erro.
+            await ctx.send(address="already-duelist")
+        else:
+            await ctx.send(address="result")
 
 
 def setup(bot):
