@@ -1,6 +1,7 @@
 import typing
 import datetime
 
+from extension.structures import utils
 from extension.structures.duel import classes
 
 
@@ -41,20 +42,62 @@ class Player:
         """Retorna a quantidade de experiência do usuário."""
         return self._dbexperience
 
+    @experience.setter
+    def experience(self, new_value):
+        # TODO
+        # Verificar se vale a pena criar essa verificação abaixo.
+        #
+        # if type(new_value) is not int:
+        #     raise TypeError("you can't change the type")
+        
+        if new_value < self._dbexperience: # Experiência foi reduzida.
+            if new_value <= 0:
+                # A experiência não pode ficar negativa.
+                new_value = 0
+        else: # Experiência foi incrementada ou permanece a mesma.
+            experience_to_level_up = utils.experience_to_level_up(self.level)
+            
+            if new_value >= experience_to_level_up:
+                new_value = new_value - experience_to_level_up
+                self._dblevel += 1
+
+        self._dbexperience = new_value
+
     @property
     def level(self) -> int:
         """Retorna o nível do usuário."""
         return self._dblevel
+
+    @level.setter
+    def level(self, new_value):
+        if new_value < self._dblevel:
+            return
+
+        self._dblevel = new_value
 
     @property
     def coins(self) -> int:
         """Retorna as modeas do usuário."""
         return self._dbcoins
 
+    @coins.setter
+    def coins(self, new_value):
+        if new_value < self._dbcoins:
+            return
+
+        self._dbcoins = new_value
+
     @property
     def votes(self) -> int:
         """Retorna a quantidade de votos do usuário."""
         return self._dbvotes
+
+    @votes.setter
+    def votes(self, new_value):
+        if new_value < self._dbvotes:
+            return
+
+        self._dbvotes = new_value
 
     @property
     def daily_reward_in_cooldown(self) -> datetime.datetime:
