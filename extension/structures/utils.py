@@ -29,6 +29,20 @@ def get_address_result(addres: str, placeholders: dict = {}):
 
     return result
 
+def experience_to_level_up(level: int) -> int:
+    """
+    Parametros
+    ----------
+    level : int
+
+    Retorno
+    -------
+    int
+        Quantidade de experiência para o próximo nível.
+    """
+    return int(level * 50 + (level * 50 / 2))
+
+
 def join_values(*values, separator: str) -> str:
     """
     Junta valores entre vírgulas e insere `separator` no final.
