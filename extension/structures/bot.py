@@ -1,4 +1,6 @@
 from discord.ext import commands
+import aiohttp
+import discord
 
 import typing
 import os
@@ -24,35 +26,6 @@ def not_dueling():
         return True
     return commands.check(check)
 
-
-class Cache:
-    def __init__(self):
-        self._data = {}
-
-    def add(self, reference: typing.Any, value: typing.Any) -> None:
-        """
-        Parameters
-        ----------
-        reference : typing.Any
-        value : typing.Any
-        """
-        self._data[reference] = value
-
-    def get(self, reference: typing.Any) -> typing.Any:
-        """
-        Parameters
-        ----------
-        reference : typing.Any
-
-        Returns
-        -------
-        typing.Any
-
-        Raises
-        ------
-        KeyError
-        """
-        return self._data[reference]
 
 
 class MarjorieContext(commands.Context):
@@ -86,6 +59,9 @@ class MarjorieContext(commands.Context):
 
         return utils.join_address(command_name, address)
 
+    async def raw_send(self, *args, **kwargs):
+        return await super().send(*args, **kwargs)
+
     async def send(self, address: str, root="Commands", **phs):
         if root == "Commands":
             address = self.get_sample_address(address)
@@ -104,8 +80,7 @@ class Marjorie(commands.Bot):
 
         self.database_client = DatabaseClient(os.getenv("MONGODB_URL"))
 
-        self.cached_servers = Cache()
-        self.cached_players = Cache()
+        self.session = aiohttp.ClientSession()
 
         self._tasks = []
         self.loop.create_task(self._task_reader())
@@ -128,34 +103,21 @@ class Marjorie(commands.Bot):
         task = self.loop.create_task(coroutine)
         self._tasks.append(task)
 
-    async def get_server(self, id: int) -> models.Server:
+    async def get_server(self, guild) -> models.Server:
         """
         Parametros
         ----------
-        id : int
-            Discord ID do servidor.
+        guild : typing.Union[discord.Guild, int]
+            Discord ID do servidor ou o próprio objeto dela.
 
         Retorno
         -------
         models.Server
         """
-        if type(id) is not int:
-            raise TypeError("int expected in `id` parameter")
+        if type(guild) is discord.Guild:
+            guild = guild.id
 
-        try:
-            return self.cached_servers.get(id)
-        except KeyError:
-            data = await self.database_client.get_server(id)
-
-            if not data:
-                data = models.Server.new(id)
-                self.cached_servers.add(id, data)
-
-                await self.database_client.new_server(data)
-
-                return data
-
-            return data
+        return await self.database_client.get_server(guild)
 
     async def get_player(self, id: int) -> models.Player:
         """
@@ -170,18 +132,7 @@ class Marjorie(commands.Bot):
         -------
         models.Player
         """
-        if type(id) is not int:
-            raise TypeError("int expected in `id` parameter")
-
-        try:
-            return self.cached_players.get(id)
-        except KeyError:
-            data = await self.database_client.get_player(id)
-
-            if data:
-                self.cached_players.add(id, data)
-
-            return data
+        return await self.database_client.get_player(id)
 
     async def new_duelist(self, id: int, class_):
         """
@@ -209,8 +160,6 @@ class Marjorie(commands.Bot):
         # um erro finalizando este método e não irá colocar `Player` em
         # cache.
 
-        self.cached_players.add(id, player)
-
     async def send(self, destiny, address: str, phs: dict, **kwargs):
         """
         Envia o resultado formato de `address` com `phs` para `destiny`.
@@ -224,27 +173,28 @@ class Marjorie(commands.Bot):
 
     async def process_commands(self, message, server):
         ctx = await self.get_context(message, cls=MarjorieContext)
+        
+        if not ctx.valid:
+            return
 
-        if ctx.valid:
-            player = await self.get_player(message.author.id)
+        player = await self.get_player(message.author.id)
 
-            ctx.server = server
-            ctx.player = player
+        ctx.server = server
+        ctx.player = player
 
-            await self.invoke(ctx)
+        await self.invoke(ctx)
 
     async def on_message(self, message):
         if message.author.bot or message.is_system():
             return
 
         server = await self.get_server(message.guild.id)
-
-        if server.is_command_channel(message.channel.id):
+        if server and server.is_command_channel(message.channel.id):
             await self.process_commands(message, server)
 
     async def on_command_error(self, ctx, error):
         if isinstance(error, errors.IsNotDuelistError):
-            await ctx.send("Not duelist")
+            await ctx.send(root="Errors", address="IsNotDuelistError")
 
         else:
             raise error

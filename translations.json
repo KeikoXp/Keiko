@@ -113,6 +113,10 @@
                 "itilian": "I tuoi messaggi sono bloccati, aprili cosi posso parlarti!",
                 "french": "Tes messages directs sont fermés, ouvre-les pour que je puisse parler avec toi."
             }
+        },
+        "IsNotDuelistError": {
+            "pt-br": "Você não é um duelista.",
+            "english": "You don't are a duelist."
         }
     },
 
@@ -232,6 +236,12 @@
                 "english": "You changed the language to {language}!",
                 "italian": "Hai cambiato la lingua per {language}!",
                 "french": "Tu as changé la langue pour {language}!"
+            }
+        },
+        "perfil": {
+            "loading": {
+                "pt-br": "Gerando perfil...",
+                "english": "Generating perfil..."
             }
         }
     },

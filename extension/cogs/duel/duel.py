@@ -1,8 +1,10 @@
+import discord
 from discord.ext import commands
-from discord import errors as discord_errors
+from PIL import Image, ImageFont, ImageDraw
 
 import asyncio
 import traceback
+import io
 
 from extension import structures
 from extension.structures import utils
@@ -13,10 +15,14 @@ class Duel(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-        self.queue = list()
-        self.queue_task = bot.loop.create_task(self.queue_selector())
+        self.perfil_background = Image.open("extension/assets/images/perfil_bg.png")
+
+        self.perfil_font = ImageFont.truetype("extension/assets/fonts/Pastika.ttf", size=30)
 
         self.duels = []
+
+        self.queue = list()
+        self.queue_task = bot.loop.create_task(self.queue_selector())
 
     async def match(self, player_one: int, player_two: int):
         player_one = self.bot.get_user(player_one)
@@ -63,13 +69,13 @@ class Duel(commands.Cog):
                 try:
                     address = base_address + player_one.language
                     await self.bot.send(player_one, address)
-                except discord_errors.Forbidden:
+                except discord.errors.Forbidden:
                     pass
 
                 try:
                     address = base_address + player_two.language
                     await self.bot.send(player_two, address)
-                except discord_errors.Forbidden:
+                except discord.errors.Forbidden:
                     pass
 
                 raise error
@@ -119,7 +125,7 @@ class Duel(commands.Cog):
 
         try:
             await ctx.send(destiny=ctx.author, travel="put-in-queue")
-        except discord_errors.Forbidden:
+        except discord.errors.Forbidden:
             await ctx.send(root="Errors", travel="Forbidden.DM-CLOSED")
         else:
             if ctx.player.premium:
@@ -149,7 +155,7 @@ class Duel(commands.Cog):
 
             try:
                 await message.edit(content=text)
-            except discord_errors.NotFound:
+            except discord.errors.NotFound:
                 message = await ctx.channel.send(text)
             finally:
                 await message.add_reaction('➡️')
@@ -211,7 +217,7 @@ class Duel(commands.Cog):
             return
 
         try:
-            await self.bot.new_duelist(ctx.user, class_)
+            await self.bot.new_duelist(ctx.author.id, class_)
         except ValueError:
             # Pode acontecer do comando ser executado duas vezes por uma
             # pessoa, se um comando for completado, o outro acabará
@@ -219,6 +225,88 @@ class Duel(commands.Cog):
             await ctx.send(address="already-duelist")
         else:
             await ctx.send(address="result")
+
+    @structures.bot.is_duelist()
+    @commands.command(name="perfil")
+    async def perfil_command(self, ctx, player: discord.User=None):
+        if not player:
+            player = ctx.author
+
+        message = await ctx.send(address="loading")
+
+        player_avatar_bytes = await utils.get_request_bytes(
+            self.bot.session, str(player.avatar_url))
+
+        with io.BytesIO(player_avatar_bytes) as fp:
+            player_avatar = Image.open(fp)
+
+        player_tag = str(player)
+
+        player = await self.bot.get_player(player.id)
+
+        image = self.perfil_background.copy()
+
+        # Posiciona a imagem do usuário
+        player_avatar = player_avatar.resize((98, 96))
+        image.paste(player_avatar, (420, 79), player_avatar.convert("RGBA"))
+
+        # Posiciona a tag do usuário
+        # O Y da reta é 114
+        # Ponto esquerdo (pE) da reta se encontra no X = 90
+        # Ponto direito da (pD) reta se encontra no X = 390
+        # O meio entre os dois pontos é 240, a expressão usada
+        # foi: `(pD - pE) / 2 + pE` -> (390 - 90) / 2 + 90 = 240
+
+        # Para posicionar algo no meio da reta, é necessário pegar o comprimento da coisa a ser posicionada e dividir por dois, depois disso subtrair o valor que deu no valor do meio da reta e utilizar a posição que resultou.
+        # Expressão (lineWidth - width / 2)
+
+        font = self.perfil_font
+
+        draw = ImageDraw.Draw(image)
+        w, h = draw.textsize(player_tag, font=font)
+        draw.text((240 - w // 2, 114 - h - 3),
+                  player_tag, fill=(0, 0, 0),
+                  font=font)
+
+        # class_image = Image.open("mage.png")
+        # class_image = class_image.resize((144 - 16, 135 - 16))
+
+        # bg.paste(class_image, (377 + 8, 230 + 8), class_image.convert("RGBA"))
+
+        # class_name = "Mage"
+        # w, h = draw.textsize(class_name, font=font)
+        # x = 377 + w // 2
+        # y = 135 + ((230 + 135) / 2) - (135 // 58)
+        # draw.text((x, y), class_name, fill=(255, 255, 255), font=font)
+
+        badges_word = "Badges"
+        w, _ = draw.textsize(badges_word, font=font)
+        draw.text((95, 270), badges_word, fill=(0, 0, 0), font=font)
+
+        draw.line(((95 + w + 3, 278), (356, 278)), (0, 0, 0), 7)
+
+        w, _ = draw.textsize(str(player.coins), font=font)
+        draw.text(((120 + (300 - 120) / 2) - (w / 2), 235),
+                  str(player.coins), fill=(0, 0, 0), font=font)
+
+        victory_word = "Victories:"
+        w, _ = draw.textsize(victory_word, font=font)
+        draw.text((112, 132), victory_word, fill=(0, 255, 75), font=font)
+
+        draw.text((112 + w + 5, 132), str(player.wins), fill=(0,0,0), font=font)
+
+        defeat_word = "Defeats:"
+        w, _ = draw.textsize(defeat_word, font=font)
+        draw.text((112, 187), defeat_word, fill=(255, 0, 75), font=font)
+
+        draw.text((112 + w + 5, 187), str(player.losts), fill=(0,0,0), font=font)
+
+        with io.BytesIO() as fp:
+            image.save(fp, format="png")
+            fp.seek(0)
+
+            player_image = discord.File(fp, filename=f"{ctx.author}-image.png")
+        await ctx.rsend(file=player_image)
 
 
 def setup(bot):

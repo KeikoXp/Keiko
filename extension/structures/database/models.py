@@ -5,12 +5,38 @@ from extension.structures import utils
 from extension.structures.duel import classes
 
 
-class Player:
+class DatabaseModel:
+    def __init__(self):
+        self.need_update = False
+        self.__locked = True
+
+    def __setattr__(self, name: str, value: typing.Any):
+        try:
+            self.__locked
+        except AttributeError:
+            pass
+        else:
+            if name.startswith("_db"):
+                self.__dict__["need_update"] = True
+
+        self.__dict__[name] = value
+
+    def to_dict(self) -> dict:
+        """Retorna todos os atributos do banco de dados da classe em um
+        dicionário."""
+        result = {}
+
+        for key, value in self.__dict__.items():
+            if key.startswith("_db") and value:
+                result[key[3:]] = value
+
+        return result
+
+
+class Player(DatabaseModel):
     def __init__(self, raw_data: dict):
         if type(raw_data) is not dict:
             raise TypeError("dict expected in 'raw_data' parameter")
-
-        self.__dict__["_locked"] = True
 
         self._db_id = raw_data.get("_id", None)
         if not self._db_id:
@@ -23,14 +49,16 @@ class Player:
 
         self._dbcoins = raw_data.pop("coins", int())
 
+        self._dbwins = raw_data.pop("wins", int())
+        self._dblosts = raw_data.pop("losts", int())
+
         self._dbpotions = raw_data.pop("potions", dict())
         self._dbamulets = raw_data.pop("amulets", dict())
 
         self._dbvotes = raw_data.pop("votes", int())
         self._dbdaily_cooldown = raw_data.pop("daily_cooldown", None)
 
-        self.need_update = False
-        self.__dict__["_locked"] = False
+        super().__init__()
 
     @property
     def class_(self) -> typing.Union[classes.Class, None]:
@@ -88,6 +116,14 @@ class Player:
         self._dbcoins = new_value
 
     @property
+    def wins(self) -> int:
+        return self._dbwins
+
+    @property
+    def losts(self) -> int:
+        return self._dblosts
+
+    @property
     def votes(self) -> int:
         """Retorna a quantidade de votos do usuário."""
         return self._dbvotes
@@ -108,26 +144,9 @@ class Player:
 
         self._dbdaily_cooldown = None
 
-    def to_dict(self) -> dict:
-        """Retorna todos os atributos do banco de dados em um dicionário."""
-        result = {}
-
-        for key, value in self.__dict__.items():
-            if key.startswith("_db") and bool(value):
-                key = key[3:]
-                result[key] = value
-
-        return result
-
     def is_duelist(self) -> bool:
         """Diz se o usuário é um duelista,"""
         return bool(self.class_)
-
-    def __setattr__(self, name: str, value: typing.Any):
-        if not self._locked and name.startswith("_db"):
-            self.__dict__["need_update"] = True
-
-        self.__dict__[name] = value
 
     @classmethod
     def new_duelist(cls, id: int, class_: classes.Class):
@@ -156,7 +175,7 @@ class Player:
         return cls(data)
 
 
-class Server:
+class Server(DatabaseModel):
     def __init__(self, raw_data: dict):
         if type(raw_data) is not dict:
             raise TypeError("dict expected in 'raw_data' parameter")
@@ -168,6 +187,8 @@ class Server:
         self._dblanguage = raw_data.pop("language", "english")
 
         self._dbcommand_channels = raw_data.get("command_channels", [])
+
+        super().__init__()
 
     @property
     def language(self) -> str:
@@ -184,17 +205,6 @@ class Server:
         typing.List[int]
         """
         return [int(c) for c in self._dbcommand_channels]
-
-    def to_dict(self) -> dict:
-        """Retorna todos os atributos do banco de dados em um dicionário."""
-        result = {}
-
-        for key, value in self.__dict__.items():
-            if key.startswith("_db") and bool(value):
-                key = key[3:]
-                result[key] = value
-
-        return result
 
     def is_command_channel(self, channel_id: id) -> bool:
         """

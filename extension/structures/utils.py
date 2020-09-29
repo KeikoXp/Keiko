@@ -1,5 +1,8 @@
+import aiohttp
+
 import json
 import inspect
+import collections
 
 with open("translations.json", encoding="utf-8") as file:
     translations = json.load(file)
@@ -28,6 +31,7 @@ def get_address_result(addres: str, placeholders: dict = {}):
                 result[index] = value.format(**placeholders)
 
     return result
+
 
 def experience_to_level_up(level: int) -> int:
     """
@@ -118,6 +122,11 @@ def check_type_hints(function):
     return wrapper
 
 
+async def get_request_bytes(session: aiohttp.ClientSession, url: str) -> bytes:
+    async with session.get(url) as response:
+        return await response.read()
+
+
 class Stack:
     """
     Atributos
@@ -147,3 +156,21 @@ class Stack:
     def reset(self) -> None:
         """Reseta o valor do stack."""
         self.value = 0
+
+
+class Cache(collections.OrderedDict):
+    def __init__(self, limit: int=100):
+        super().__init__()
+
+        self.limit = limit
+
+    def __setitem__(self, *args):
+        item_poped = None
+        if len(self) == self.limit:
+            item_poped = self.popitem(last=False)
+
+        super().__setitem__(*args)
+        return item_poped
+
+    def add(self, name, value):
+        return self.__setitem__(name, value)
