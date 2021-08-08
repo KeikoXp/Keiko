@@ -1,2 +1,8 @@
-__pycache__/
-tests.py
+node_modules/
+.yarn/
+.yarnrc.yml
+.env
+yarn.lock
+package-lock.json
+.husky/_/
+.vscode/
